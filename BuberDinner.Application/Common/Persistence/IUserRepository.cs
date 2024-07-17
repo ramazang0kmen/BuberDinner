@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BuberDinner.Application.Common.Interfaces.Authentication
+namespace BuberDinner.Application.Common.Persistence
 {
-    public interface IJwtTokenGenerator
+    public interface IUserRepository
     {
-        string GenerateToken(User user);
+        User? GetUserByEmail(string email);
+        void Add(User user);
     }
 }
