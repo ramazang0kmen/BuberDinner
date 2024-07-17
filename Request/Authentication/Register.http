@@ -1,0 +1,8 @@
+POST http://localhost:5119/auth/register
+
+{
+    "firstName" : "Bob",
+    "lastName" : "Martin",
+    "email" : "bob@martinhost.com",
+    "password" : "bob11"
+}
