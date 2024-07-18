@@ -3,13 +3,16 @@ using BuberDinner.Contracts.Authantication;
 using BuberDinner.Application.Services.Authentication;
 using BuberDinner.Contracts.Authentication;
 using BuberDinner.Api.Filters;
+using BuberDinner.Application.Common.Errors;
+using FluentResults;
+using ErrorOr;
+using BuberDinner.Domain.Common.Errors;
 
 
 namespace BuberDinner.Api.Controllers;
-[ApiController]
 [Route("auth")]
 //[ErrorHandlingFilter]
-public class AuthanticationController : ControllerBase
+public class AuthanticationController : ApiController
 {
     private readonly IAuthenticationService _authenticationService;
 
@@ -21,20 +24,25 @@ public class AuthanticationController : ControllerBase
     [HttpPost("register")]
     public IActionResult Register(RegisterRequest request)
     {
-        var authResult = _authenticationService.Register(
+        ErrorOr<AuthenticationResult> authResult = _authenticationService.Register(
             request.FirstName,
             request.LastName,
             request.Email,
             request.Password);
 
-        var response = new AuthenticationResponse(
-            authResult.user.Id,
-            authResult.user.FirstName,
-            authResult.user.LastName,
-            authResult.user.Email,
-            authResult.Token);
+        return authResult.Match(
+            authResult => Ok(MapAuthResult(authResult)),
+            errors => Problem(errors));
+    }
 
-        return Ok(response);
+    private static AuthenticationResponse MapAuthResult(AuthenticationResult authResult)
+    {
+        return new AuthenticationResponse(
+                        authResult.user.Id,
+                        authResult.user.FirstName,
+                        authResult.user.LastName,
+                        authResult.user.Email,
+                        authResult.Token);
     }
 
     [HttpPost("login")]
@@ -44,13 +52,13 @@ public class AuthanticationController : ControllerBase
             request.Email,
             request.Password);
 
-        var response = new AuthenticationResponse(
-            authResult.user.Id,
-            authResult.user.FirstName,
-            authResult.user.LastName,
-            authResult.user.Email,
-            authResult.Token);
+        if (authResult.IsError && authResult.FirstError == Errors.Authentication.InvalidCredentials)
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized, 
+                title: authResult.FirstError.Description);
 
-        return Ok(response);
+        return authResult.Match(
+            authResult => Ok(MapAuthResult(authResult)),
+            errors => Problem(errors));
     }
 }
