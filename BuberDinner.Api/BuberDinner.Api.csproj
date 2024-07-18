@@ -7,6 +7,10 @@
     <UserSecretsId>3449be75-f4ae-4327-abf4-00d23b75a1e6</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="11.1.0" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\BuberDinner.Contracts\BuberDinner.Contracts.csproj" />
 		<ProjectReference Include="..\BuberDinner.Application\BuberDinner.Application.csproj" />
