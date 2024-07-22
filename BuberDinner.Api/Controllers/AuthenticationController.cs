@@ -3,11 +3,11 @@ using BuberDinner.Contracts.Authantication;
 using BuberDinner.Contracts.Authentication;
 using ErrorOr;
 using BuberDinner.Domain.Common.Errors;
-using BuberDinner.Application.Services.Authentication.Common;
 using MediatR;
 using BuberDinner.Application.Authentication.Commands.Register;
 using BuberDinner.Application.Authentication.Query.Login;
 using MapsterMapper;
+using BuberDinner.Application.Authentication.Common;
 
 
 namespace BuberDinner.Api.Controllers;
