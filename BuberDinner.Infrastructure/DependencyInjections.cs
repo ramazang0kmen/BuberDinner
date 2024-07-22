@@ -6,6 +6,10 @@ using Microsoft.Extensions.Configuration;
 using BuberDinner.Infrastructure.Persistence;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Common.Interfaces.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace BuberDinner.Infrastructure
 {
@@ -15,12 +19,36 @@ namespace BuberDinner.Infrastructure
             this IServiceCollection services, 
             ConfigurationManager configuration)
         {
-            services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
-
-            services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+            services.AddAuth(configuration);
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
             services.AddScoped<IUserRepository, UserRepository>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddAuth(
+            this IServiceCollection services,
+            ConfigurationManager configuration)
+        {
+            var jwtSetting = new JwtSettings();
+            configuration.Bind(JwtSettings.SectionName, jwtSetting);
+
+            services.AddSingleton(Options.Create(jwtSetting));
+            services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+
+            services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = jwtSetting.Issuer,
+                    ValidAudience = jwtSetting.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSetting.Secret))
+                });
 
             return services;
         }

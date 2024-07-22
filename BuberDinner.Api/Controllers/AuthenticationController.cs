@@ -8,10 +8,12 @@ using BuberDinner.Application.Authentication.Commands.Register;
 using BuberDinner.Application.Authentication.Query.Login;
 using MapsterMapper;
 using BuberDinner.Application.Authentication.Common;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace BuberDinner.Api.Controllers;
 [Route("auth")]
+[AllowAnonymous]
 //[ErrorHandlingFilter]
 public class AuthanticationController : ApiController
 {
