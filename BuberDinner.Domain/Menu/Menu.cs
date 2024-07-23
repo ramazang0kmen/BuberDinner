@@ -21,22 +21,34 @@ namespace BuberDinner.Domain.Menu
 
         public HostId HostId { get; }
         public IReadOnlyList<DinnerId> DinnerIds => _dinnerIds.AsReadOnly();
-        public IReadOnlyList<MenuReviewId> menuReviewIds => _menuReviewIds.AsReadOnly();
+        public IReadOnlyList<MenuReviewId> MenuReviewIds => _menuReviewIds.AsReadOnly();
         public DateTime CreatedDateTime { get; }
         public DateTime UpdatedDateTime { get; }
 
-        private Menu(MenuId menuId, string name, string description, HostId hostId, DateTime createdDateTime, DateTime updatedDateTime) : base(menuId)
+        private Menu(
+            MenuId menuId,
+            HostId hostId,
+            string name,
+            string description,
+            AverageRating averageRating,
+            List<MenuSection> sections) : base(menuId)
         {
+            HostId = hostId;
             Name = name;
             Description = description;
-            HostId = hostId;
-            CreatedDateTime = createdDateTime;
-            UpdatedDateTime = updatedDateTime;
+            AverageRating = averageRating;
+            _sections = sections;
         }
 
-        public static Menu Create(string name, string description, HostId hostId)
+        public static Menu Create(HostId hostId, string name, string description, List<MenuSection>? sections = null)
         {
-            return new(MenuId.CreateUnique(), name, description, hostId, DateTime.UtcNow, DateTime.UtcNow);
+            return new Menu(
+                MenuId.CreateUnique(),
+                hostId,
+                name,
+                description,
+                AverageRating.CreateNew(),
+                sections ?? new());
         }
     }
 }

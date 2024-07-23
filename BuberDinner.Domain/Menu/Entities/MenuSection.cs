@@ -17,7 +17,7 @@ namespace BuberDinner.Domain.Menu.Entities
             Description = description;
         }
 
-        public static MenuSection Create(string name, string description)
+        public static MenuSection Create(string name, string description, List<MenuItem> menuItems)
         {
             return new(MenuSectionId.CreateUnique(), name, description);
         }
